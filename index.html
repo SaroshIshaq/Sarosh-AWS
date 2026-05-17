@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UniEvent - University Event Management System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 30px 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        header h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+
+        header p {
+            color: #666;
+            font-size: 1.1em;
+        }
+
+        .info-bar {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .info-bar .status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.95em;
+        }
+
+        .user-info {
+            background: rgba(102, 126, 234, 0.1);
+            padding: 8px 12px;
+            border-radius: 5px;
+            font-size: 0.9em;
+            color: #333;
+        }
+
+        .status-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: #4CAF50;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .search-box {
+            display: flex;
+            gap: 10px;
+        }
+
+        .search-box input {
+            padding: 10px 15px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            width: 250px;
+            font-size: 0.95em;
+            transition: border-color 0.3s;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .search-box button, .btn {
+            padding: 10px 20px;
+            background-color: #667eea;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background-color 0.3s;
+        }
+
+        .search-box button:hover, .btn:hover {
+            background-color: #764ba2;
+        }
+
+        .btn-secondary {
+            background-color: #4CAF50;
+        }
+
+        .btn-secondary:hover {
+            background-color: #45a049;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        .events-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .event-card {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .event-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .event-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            background-color: #f0f0f0;
+        }
+
+        .event-content {
+            padding: 20px;
+        }
+
+        .event-title {
+            font-size: 1.3em;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 10px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .event-meta {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 15px;
+            font-size: 0.95em;
+            color: #666;
+        }
+
+        .event-meta-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .event-meta-item strong {
+            color: #333;
+            min-width: 70px;
+        }
+
+        .event-description {
+            color: #666;
+            font-size: 0.9em;
+            line-height: 1.4;
+            margin-bottom: 15px;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            min-height: 42px;
+        }
+
+        .event-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 15px;
+            border-top: 1px solid #eee;
+        }
+
+        .ticket-status {
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 0.85em;
+            font-weight: 600;
+        }
+
+        .ticket-status.on-sale {
+            background-color: #c8e6c9;
+            color: #2e7d32;
+        }
+
+        .ticket-status.off-sale {
+            background-color: #ffccbc;
+            color: #d84315;
+        }
+
+        .ticket-status.unknown {
+            background-color: #e0e0e0;
+            color: #616161;
+        }
+
+        .event-link {
+            background-color: #667eea;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 0.9em;
+            font-weight: 600;
+            transition: background-color 0.3s;
+        }
+
+        .event-link:hover {
+            background-color: #764ba2;
+        }
+
+        .empty-state {
+            background: white;
+            padding: 60px 20px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .empty-state h2 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .empty-state p {
+            color: #666;
+            font-size: 1.1em;
+        }
+
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .footer {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            text-align: center;
+            border-radius: 8px;
+            color: #666;
+            margin-top: 30px;
+        }
+
+        #statusMessage {
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 1.8em;
+            }
+
+            .info-bar {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .search-box {
+                width: 100%;
+            }
+
+            .search-box input {
+                width: 100%;
+            }
+
+            .events-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .button-group {
+                flex-direction: column;
+                width: 100%;
+            }
+
+            .button-group button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎓 UniEvent</h1>
+            <p>Discover and register for university events</p>
+            <p style="color: #667eea; margin-top: 10px; font-size: 0.95em;"><strong>Developed by: Sarosh Ishaq | Registration No: 2023640</strong></p>
+        </header>
+
+        <div class="info-bar">
+            <div class="status">
+                <div class="status-dot"></div>
+                <span>System Status: <strong>Healthy</strong></span>
+            </div>
+            <div class="user-info">
+                👤 <strong>Sarosh Ishaq</strong> | Reg: 2023640
+            </div>
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="Search events..." />
+                <button onclick="searchEvents()">Search</button>
+            </div>
+            <div class="button-group">
+                <button class="btn btn-secondary" onclick="refreshEvents()">🔄 Refresh Events</button>
+                <button class="btn" onclick="viewAPIStatus()">API Status</button>
+            </div>
+        </div>
+
+        <div id="statusMessage"></div>
+
+        {% if events and events|length > 0 %}
+            <div class="events-grid" id="eventsGrid">
+                {% for event in events %}
+                    <div class="event-card">
+                        <img src="{{ event.image }}" alt="{{ event.name }}" class="event-image" onerror="this.src='/static/images/default-event.png'">
+                        <div class="event-content">
+                            <h3 class="event-title">{{ event.name }}</h3>
+                            <div class="event-meta">
+                                <div class="event-meta-item">
+                                    <strong>📅 Date:</strong>
+                                    <span>{{ event.date }}</span>
+                                </div>
+                                <div class="event-meta-item">
+                                    <strong>📍 Location:</strong>
+                                    <span>{{ event.venue }}, {{ event.city }}</span>
+                                </div>
+                            </div>
+                            <p class="event-description">{{ event.description }}</p>
+                            <div class="event-footer">
+                                <span class="ticket-status {% if event.ticketStatus == 'onsale' %}on-sale{% elif event.ticketStatus == 'offsale' %}off-sale{% else %}unknown{% endif %}">
+                                    {% if event.ticketStatus == 'onsale' %}🎟️ On Sale{% elif event.ticketStatus == 'offsale' %}✖️ Off Sale{% else %}❓ Status Unknown{% endif %}
+                                </span>
+                                <a href="{{ event.url }}" target="_blank" class="event-link">View Details →</a>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+            <div style="text-align: center; color: white; margin-top: 20px;">
+                <p>Last Updated: {{ last_updated }}</p>
+            </div>
+        {% else %}
+            <div class="empty-state">
+                <h2>📭 No events available</h2>
+                <p>Events are being fetched. Please refresh the page in a few moments.</p>
+                <div class="loader"></div>
+            </div>
+        {% endif %}
+
+        <div class="footer">
+            <p>UniEvent © 2024 | Cloud Architecture: AWS | Region: us-east-1 | Python Flask</p>
+            <p><small>Developed by Sarosh Ishaq (2023640) | AWS Cloud Architecture Project</small></p>
+        </div>
+    </div>
+
+    <script>
+        async function searchEvents() {
+            const query = document.getElementById('searchInput').value.trim();
+            if (!query) {
+                alert('Please enter a search term');
+                return;
+            }
+
+            try {
+                showMessage('🔍 Searching...', 'info');
+                const response = await fetch(`/api/search?q=${encodeURIComponent(query)}`);
+                const data = await response.json();
+
+                if (data.status === 'success') {
+                    displayEvents(data.events);
+                    showMessage(`✓ Found ${data.count} events matching "${query}"`, 'success');
+                } else {
+                    showMessage('❌ Search error: ' + data.message, 'error');
+                }
+            } catch (error) {
+                showMessage('❌ Search failed: ' + error.message, 'error');
+            }
+        }
+
+        async function refreshEvents() {
+            try {
+                showMessage('🔄 Refreshing events...', 'info');
+                const response = await fetch('/api/refresh-events', { method: 'POST' });
+                const data = await response.json();
+
+                if (data.status === 'success') {
+                    showMessage(`✓ Events refreshed! (${data.count} events)`, 'success');
+                    setTimeout(() => location.reload(), 1000);
+                } else {
+                    showMessage('❌ Refresh error: ' + data.message, 'error');
+                }
+            } catch (error) {
+                showMessage('❌ Refresh failed: ' + error.message, 'error');
+            }
+        }
+
+        async function viewAPIStatus() {
+            try {
+                const response = await fetch('/api/status');
+                const data = await response.json();
+                const message = `API Status:\n\nTotal Events: ${data.cachedEvents}\nLast Refresh: ${new Date(data.lastRefresh).toLocaleString()}\nCache Expires: ${new Date(data.cacheExpiry).toLocaleString()}\nRegion: ${data.region}`;
+                alert(message);
+            } catch (error) {
+                alert('❌ API Status Error: ' + error.message);
+            }
+        }
+
+        function displayEvents(events) {
+            const grid = document.getElementById('eventsGrid');
+            if (events.length === 0) {
+                grid.innerHTML = '<div class="empty-state" style="grid-column: 1/-1;"><h2>No events found</h2></div>';
+                return;
+            }
+
+            grid.innerHTML = events.map(event => `
+                <div class="event-card">
+                    <img src="${event.image}" alt="${event.name}" class="event-image" onerror="this.src='/static/images/default-event.png'">
+                    <div class="event-content">
+                        <h3 class="event-title">${event.name}</h3>
+                        <div class="event-meta">
+                            <div class="event-meta-item">
+                                <strong>📅 Date:</strong>
+                                <span>${new Date(event.date).toLocaleDateString()}</span>
+                            </div>
+                            <div class="event-meta-item">
+                                <strong>📍 Location:</strong>
+                                <span>${event.venue}, ${event.city}</span>
+                            </div>
+                        </div>
+                        <p class="event-description">${event.description}</p>
+                        <div class="event-footer">
+                            <span class="ticket-status ${event.ticketStatus === 'onsale' ? 'on-sale' : event.ticketStatus === 'offsale' ? 'off-sale' : 'unknown'}">
+                                ${event.ticketStatus === 'onsale' ? '🎟️ On Sale' : event.ticketStatus === 'offsale' ? '✖️ Off Sale' : '❓ Status Unknown'}
+                            </span>
+                            <a href="${event.url}" target="_blank" class="event-link">View Details →</a>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function showMessage(message, type) {
+            const messageDiv = document.getElementById('statusMessage');
+            messageDiv.innerHTML = `<div style="background-color: ${type === 'success' ? '#c8e6c9' : type === 'error' ? '#ffccbc' : '#e3f2fd'}; color: ${type === 'success' ? '#2e7d32' : type === 'error' ? '#d84315' : '#1565c0'}; padding: 15px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid ${type === 'success' ? '#4CAF50' : type === 'error' ? '#f44336' : '#2196F3'};">${message}</div>`;
+            setTimeout(() => {
+                messageDiv.innerHTML = '';
+            }, 5000);
+        }
+
+        document.getElementById('searchInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                searchEvents();
+            }
+        });
+    </script>
+</body>
+</html>
